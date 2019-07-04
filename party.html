@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-118891840-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-118891840-1');
+    </script>
+    <meta charset="UTF-8">
+    <title>Track-ly</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+            integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+            integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+            crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Caveat:700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark text-white partyBg">
+<script src="/party.js">
+</script>
+<nav class="navbar navbar-expand-sm navbar-dark bg-secondary">
+    <img class="navbar-brand" width="30" src="/favicon.png"/>
+    <button class="navbar-toggler easy-on-eyes-text" type="button" data-toggle="collapse"
+            data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="/">Home</a>
+            <a class="nav-item nav-link" href="/about">About</a>
+            <a class="nav-item nav-link" href="/contact">Contact</a>
+            <a class="nav-item nav-link" href="/howTo">How To Use</a>
+        </div>
+
+    </div>
+    <button type="button" class="btn btn-danger easy-on-eyes-text mr-1 autoshrink" id="helpButton">Help</button>
+    <button type="button" style="display: none" class="btn btn-success easy-on-eyes-text mr-1 autoshrink"
+            id="launchBtn">Open Playlist
+    </button>
+    <button type="button" class="btn btn-success easy-on-eyes-text mr-1 autoshrink" id="authoriseButton"><span
+            class="long-text">New Playlist</span><span class="short-text">New</span></button>
+
+    <!--// old link spotify button -->
+    <button type="button" class="btn btn-success easy-on-eyes-text autoshrink" id="importPlButton"><span
+            class="long-text">Import Existing Playlist</span><span class="short-text">Import</span></button>
+</nav>
+<div class="container mt-2 p-1 pl-2 pr-2" id="alertLocation"></div>
+
+<div style="opacity: 0.9;
+    filter: alpha(opacity=90);" class="container mt-2 p-2 pl-5 pr-5 border rounded bg-secondary">
+    <div class="row">
+        <div class="col-lg-6"><h1 id="title" class="easy-on-eyes-text">Room: </h1></div>
+        <div class="col-lg-6"><h1 class="easy-on-eyes-text">Members: </h1></div>
+
+
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <p class="easy-on-eyes-text">
+                <button class="btn btn-info btn-block" data-toggle="collapse" data-target="#settingsDisplay">View
+                    settings
+                </button>
+                <div class="collapse" id="settingsDisplay">
+                    <h3>Current settings: </h3>
+            <p>Songs added: <span id="songsAddedDisplay"></span></p>
+            <p>Maximum songs per user: <span id="maximumSongsDisplay"></span></p>
+            <p>Explicit songs: <span id="explicitSongsDisplay"></span></p>
+            <p>Ability to delete songs: <span id="deleteSongsDisplay"></span></p>
+        </div>
+        </p>
+    </div>
+
+    <div class="col-lg-6 col-offset-lg-6">
+        <button class="btn btn-info btn-block" data-toggle="collapse" data-target="#members">View members
+        </button>
+        <div class="collapse" id="members"><p class="easy-on-eyes-text"></p></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="inputSong" class="easy-on-eyes-text">Enter a track/artist/album!</label>
+                    <input type="text" class="form-control darcula-input" id="inputSong"
+                           placeholder="Enter a track/artist/album!">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <label for="typeSelection" class="easy-on-eyes-text">Select:</label>
+                <div class="input-group">
+                    <select class="form-control darcula-input" id="typeSelection">
+                        <option class="darcula-input">Track</option>
+                        <option class="darcula-input">Artist</option>
+                        <option class="darcula-input">Album</option>
+                    </select>
+                    <span class="input-group-btn">
+                            <button type="button" class="btn btn-success easy-on-eyes-text centerbutton"
+                                    id="inputSongBtn"><i class="large material-icons">search</i>
+                            </button>
+                        </span>
+                </div>
+            </div>
+
+        </div>
+
+        <br><br>
+    </div>
+
+    <div class="col-lg-6">
+        <h1 class="easy-on-eyes-text">Song List:</h1>
+        <div class="" id="songList"></div>
+    </div>
+    <div class="text-center">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="73P6JRAPWGMBW">
+        <input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+        <img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+    </form>
+    </div>
+</div>
+</div>
+<div class="modal fade bg-dark text-white" id="choosePlaylistModal" tabindex="-1" role="dialog"
+     aria-labelledby="plmodallabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title easy-on-eyes-text" id="plmodallabel">Please confirm:</h5>
+                    <button type="button" class="close easy-on-eyes-text" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="playlistModalBody">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary easy-on-eyes-text" data-dismiss="modal">Close
+                    </button>
+                    <button type="button" class="btn btn-primary easy-on-eyes-text" id="addConfirmedPlaylist">Confirm
+                        Playlist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade text-white" id="songConfirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title easy-on-eyes-text">Please confirm:</h5>
+                    <button type="button" class="close easy-on-eyes-text" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary easy-on-eyes-text" data-dismiss="modal">Close
+                    </button>
+                    <button type="button" class="btn btn-primary easy-on-eyes-text" id="addConfirmedSongs">Add song
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bg-dark text-white" id="helpModal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title easy-on-eyes-text" id="helpModalLabel">Help:</h5>
+                    <button type="button" class="close easy-on-eyes-text" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="helpModalBody">
+                    <ul>
+                        <li>Input your song/artist/album choice then select which song you want to have have added to
+                            the playlist
+                        </li>
+                        <li>You don't need Spotify to add songs to the playlist!</li>
+                        <li>At least one person needs a Spotify account to play the playlist</li>
+                        <li>If other users can't see you in the party room, try refreshing the page</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary easy-on-eyes-text" data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-white" id="slideshowModal" tabindex="-1" role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title easy-on-eyes-text" id="slideshowModalLabel">How to use Trackly:</h5>
+                    <button type="button" class="close easy-on-eyes-text" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="slideshowModalBody">
+                    <!-- Slideshow container -->
+                    <div class="slideshow-container">
+
+                        <!-- Full-width images with number and caption text -->
+                        <div class="mySlides">
+
+                            <img src="/search.png" style="width:100%; max-width: 100%" class="ssimage">
+                            <div class="text">Search for anything from Spotify with the search box</div>
+                        </div>
+
+                        <div class="mySlides">
+                            <img src="/search by category.png" style="width:100%; max-width: 100%" class="ssimage">
+                            <div class="text">Select any category to tailor your search</div>
+                        </div>
+
+                        <div class="mySlides">
+                            <img src="/members and song list.png" style="width:100%; max-width: 100%" class="ssimage">
+                            <div class="text">All queued songs and room guests are displayed on the right</div>
+                        </div>
+
+                        <div class="mySlides">
+                            <img src="/spotify interaction.png" style="width:100%; max-width: 100%" class="ssimage">
+                            <div class="text">Link or create a Spotify playlist using the buttons on the top right</div>
+                        </div>
+                        <!-- Next and previous buttons -->
+                        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                        <a class="next" onclick="plusSlides(1)">&#10095;</a>
+                    </div>
+                    <br>
+
+                    <!-- The dots/circles -->
+                    <div style="text-align:center">
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
+                        <span class="dot" onclick="currentSlide(3)"></span>
+                        <span class="dot" onclick="currentSlide(4)"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary easy-on-eyes-text" data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Slideshow crap
+    var slideIndex = 1;
+    showSlides(slideIndex);
+
+    // Next/previous controls
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    // Thumbnail image controls
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides(n) {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+        var dots = document.getElementsByClassName("dot");
+        if (n > slides.length) {
+            slideIndex = 1
+        }
+        if (n < 1) {
+            slideIndex = slides.length
+        }
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex - 1].style.display = "block";
+        dots[slideIndex - 1].className += " active";
+    }
+</script>
+</body>
+</html>
